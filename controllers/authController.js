@@ -1,7 +1,7 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
-const { ConflictError, BadRequestError } = require("../errors"); // Errores personalizados
+const { ConflictError, BadRequestError } = require("../middleware/error"); // Errores personalizados
 
 // Crea un nuevo usuario (registro)
 module.exports.signup = (req, res, next) => {
@@ -11,7 +11,10 @@ module.exports.signup = (req, res, next) => {
   User.findOne({ email })
     .then((user) => {
       if (user) {
-        throw new ConflictError("El correo electrónico ya está en uso");
+        throw new ConflictError(
+          "El usuario ya está registrado con este correo"
+        );
+        return res.status(409).json({ error: ConflictError });
       }
 
       // Encripta la contraseña
@@ -50,11 +53,7 @@ module.exports.signin = (req, res, next) => {
         }
 
         // Genera el token JWT
-        const token = jwt.sign(
-          { _id: user._id },
-          "tu_secreto", // Cambia 'tu_secreto' por tu clave secreta
-          { expiresIn: "7d" } // El token expira en 7 días
-        );
+        const token = jwt.sign({ _id: user._id }, "jwt", { expiresIn: "7d" });
 
         // Retorna el token en el encabezado y el cuerpo de la respuesta
         res.send({ token });

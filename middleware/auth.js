@@ -12,7 +12,7 @@ module.exports = (req, res, next) => {
 
   let payload;
   try {
-    payload = jwt.verify(token, "tu_secreto"); // Reemplaza 'tu_secreto' con tu clave secreta
+    payload = jwt.verify(token, "jwt");
   } catch (err) {
     return res.status(401).send({ message: "Token no válido" });
   }
