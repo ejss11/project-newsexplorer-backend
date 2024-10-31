@@ -9,7 +9,7 @@ module.exports.getUserInfo = (req, res, next) => {
       if (!user) {
         return res.status(404).send({ message: "Usuario no encontrado" });
       }
-      res.send({ email: user.email, name: user.name });
+      res.send({ _id: user._id, email: user.email, name: user.name });
     })
     .catch(next); // Manejo de errores
 };

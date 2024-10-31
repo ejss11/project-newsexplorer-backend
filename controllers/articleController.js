@@ -1,3 +1,4 @@
+const { default: mongoose } = require("mongoose");
 const Article = require("../models/article");
 
 // Devuelve todos los artículos guardados por el usuario
@@ -5,6 +6,7 @@ module.exports.getArticles = (req, res, next) => {
   const userId = req.user._id;
 
   Article.find({ owner: userId })
+    .select("+owner")
     .then((articles) => res.send(articles))
     .catch(next);
 };
@@ -33,7 +35,11 @@ module.exports.deleteArticle = (req, res, next) => {
   const userId = req.user._id;
   const { articleId } = req.params;
 
-  Article.findById(articleId)
+  if (!mongoose.Types.ObjectId.isValid(articleId)) {
+    return res.status(400).send({ message: "ID article Invalido " });
+  }
+
+  Article.findByIdAndDelete(articleId)
     .then((article) => {
       if (!article) {
         return res.status(404).send({ message: "Artículo no encontrado" });
